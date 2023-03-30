@@ -1,0 +1,19 @@
+﻿@page "/change_them"
+
+@inject IJSRuntime js
+<div class="alert alert-info my-2">
+    Click here to switch themes
+    <button disabled @onclick="SwapTheme" class="btn btn-primary">@SetThemeName Mode</button>
+</div>
+
+@code {
+
+    bool isDark;
+    string SetThemeName => isDark ? "Dark" : "Light";
+
+    async Task SwapTheme()
+    {
+        isDark = !isDark;
+        await js.InvokeVoidAsync("themeChooser.setTheme", SetThemeName);
+    }
+}

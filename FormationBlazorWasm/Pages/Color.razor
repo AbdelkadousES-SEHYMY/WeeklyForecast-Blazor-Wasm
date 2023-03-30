@@ -1,0 +1,29 @@
+﻿@page "/color"
+
+<h3>Color</h3>
+<ul class="list-group">
+	@foreach (var item in items)
+	{
+		<li @key="item.Id" class="list-group-item">
+			<h1>@item.Value</h1>
+			<input type="checkbox" />
+		</li>
+	}
+</ul>
+<button class="btn btn-outline-primary btn-sm m-2" @onclick="_ => items = items.Reverse()">Reverse</button>
+
+@code {
+	
+	IEnumerable<Item> items = new Item[] {
+		 new Item {Id = 0, Value = "Green" },
+		 new Item {Id = 1, Value = "Blue" },
+		 new Item {Id = 2, Value = "Orange" },
+		 new Item {Id = 3, Value = "Purple" }
+ };
+
+	 private class Item
+	{
+		public int Id { get; set; }
+		public string Value { get; set; }
+	}
+}

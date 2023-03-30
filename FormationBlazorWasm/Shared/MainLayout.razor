@@ -1,0 +1,57 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+@*        <ThemeChooser></ThemeChooser>
+*@        <article class="content px-4">
+
+            @Body
+        </article>
+    </main>
+
+    <GeolocationExample/>
+
+<script suppress-error="BL9992">
+// JavaScript for this interop example can be seen at:
+// https://raw.githubusercontent.com/EdCharbeneau/BlazorBookExamples/master/BookWasm/wwwroot/js/geolocation.js
+
+// - geolocation.js
+// - JavaScript source is shown below for example only. 
+// Script tags should not be placed inside components because they cannot be updated dynamically. To fix this, move the script tag to the 'index.html' file or another static location. For more information see https://go.microsoft.com/fwlink/?linkid=872131
+    window.blazorGeolocation = {
+    toSerializeable: function (e)
+    {
+        return {
+            "coords": {
+                "latitude": e.coords.latitude,
+                "longitude": e.coords.longitude
+            }, "timestamp": new Date(e.timestamp)
+        };
+    },
+    getCurrentPosition: function (geolocationRef, options) {
+        function onSuccess(result) {
+            return geolocationRef.invokeMethodAsync('RaiseOnGetPosition', blazorGeolocation.toSerializeable(result));
+        };
+
+        function onError(er) {
+            return geolocationRef.invokeMethodAsync('RaiseOnGetPositionError', er.code);
+        };
+
+        navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+    },
+
+    hasGeolocaitonFeature: function () {
+        return navigator.geolocation ? true : false;
+    }
+}; 
+
+</script>
+</div>

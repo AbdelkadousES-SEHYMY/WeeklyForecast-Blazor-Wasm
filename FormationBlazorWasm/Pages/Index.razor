@@ -1,0 +1,94 @@
+﻿@page "/"
+@inject IJSRuntime js;
+@using Pages;
+
+<PageTitle>Index</PageTitle>
+<h1>Hello, world!</h1>
+
+@using Data;
+@using static FormationBlazorWasm.Pages.FetchData;
+@inject WeatherForecastService WeatherService
+
+<h3>WeeklyForecast</h3>
+
+<div class="d-flex">
+
+	@if (forecasts == null)
+	{
+		<span>No Data</span>
+	}
+	else
+	{
+
+		foreach (var forecast in forecasts)
+		{
+			<WeatherDay TemperatureC="forecast.TemperatureC"
+				Summary="@forecast.Summary"
+				DayOfWeek="forecast.Date.DayOfWeek"
+				OnSelected="HandleItemSelected"
+				Selected="forecast.Selected">
+				<CustomMessage>
+					@if (forecast.Summary == "Rainy")
+					{
+						<div class="alert alert-danger">
+							Tornado Warning!
+						</div>
+					}
+				</CustomMessage>
+			</WeatherDay>
+		}
+	}
+</div>
+@code {
+	public bool Selected { get; set; }
+	WeatherForecast[] forecasts;
+	protected override async Task OnInitializedAsync()
+	{
+		forecasts = await WeatherService
+				.GetForecastAsync(DateTime.Now);
+	}
+	void HandleItemSelected(DayOfWeek dayOfWeek)
+	{
+		foreach (var forecast in forecasts)
+		{
+			forecast.Selected = forecast.Date.DayOfWeek == dayOfWeek;
+		}
+	}
+}
+
+
+<script suppress-error="BL9992">
+// JavaScript for this interop example can be seen at:
+// https://raw.githubusercontent.com/EdCharbeneau/BlazorBookExamples/master/BookWasm/wwwroot/js/geolocation.js
+
+// - geolocation.js
+// - JavaScript source is shown below for example only. 
+// Script tags should not be placed inside components because they cannot be updated dynamically. To fix this, move the script tag to the 'index.html' file or another static location. For more information see https://go.microsoft.com/fwlink/?linkid=872131
+window.blazorGeolocation = {
+    toSerializeable: function (e)
+    {
+        return {
+            "coords": {
+                "latitude": e.coords.latitude,
+                "longitude": e.coords.longitude
+            }, "timestamp": new Date(e.timestamp)
+        };
+    },
+    getCurrentPosition: function (geolocationRef, options) {
+        function onSuccess(result) {
+            return geolocationRef.invokeMethodAsync('RaiseOnGetPosition', blazorGeolocation.toSerializeable(result));
+        };
+
+        function onError(er) {
+            return geolocationRef.invokeMethodAsync('RaiseOnGetPositionError', er.code);
+        };
+
+        navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+    },
+
+    hasGeolocaitonFeature: function () {
+        return navigator.geolocation ? true : false;
+    }
+}; 
+
+</script>
